@@ -46,18 +46,22 @@ def login():
             # Then store the result of that query to a `user` variable so it can be
             # passed to the login_user() method below.
             user = db.session.query(UserProfile).filter_by(username=username).first()
-
-			if user is not None and check_password_hash(user.password, password):
-	            # get user id, load into session
-	            login_user(user)
+            if user is not None and check_password_hash(user.password,password):
+                # get user id, load into session
+                login_user(user)
 
                 # remember to flash a message to the user
- 				flash('Logged in successfully.', 'Success')
+                flash('Logged in successfully.', 'Success')
                 return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
             else:
                 flash('Either your username or password is incorrect.', 'Oops')
     return render_template("login.html", form=form)
 
+
+@app.route('/secure-page')
+@login_required
+def secure_page():
+    return render_template("secure_page.html")
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
