@@ -51,10 +51,10 @@ def login():
                 login_user(user)
 
                 # remember to flash a message to the user
-                flash('Logged in successfully.', 'Success')
+                flash('Logged in successfully.', 'success')
                 return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
             else:
-                flash('Either your username or password is incorrect.', 'Oops')
+                flash('Either your username or password is incorrect.', 'danger')
     return render_template("login.html", form=form)
 
 
@@ -62,6 +62,13 @@ def login():
 @login_required
 def secure_page():
     return render_template("secure_page.html")
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logging out, you will be returned to the home page', 'success')
+    return redirect(url_for('home'))
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
