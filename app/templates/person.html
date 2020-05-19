@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block main %}
+  <div class="contain">
+    <div class="card mb-3 borderCol" style="max-width: 480px;">
+      <div class="row no-gutters">
+        <div class="col-md-4">
+          <img src="{{ url_for('static', filename='uploads/users/'+user.pic) }}" class="card-img image" alt="...">
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <p class="card-text heading"> {{user.first_name}} {{user.last_name}} </p>
+                <p class="card-text description text-muted"><i class="fas fa-map-marker-alt"></i> {{user.location}} </p>
+                <p class="card-text description text-muted"><i class="far fa-calendar"></i> Joined on {{user.date}} </p>
+            </div>
+        </div>
+        
+        <div class="card-body">
+          {% if user.account_type == "Student"%}
+            <h5 class="class-title edit text-muted">My Upcoming Events: </h5>
+            
+
+            {% for event in meep %}
+
+              <p class="card-text bio text-muted"> {{event.event_name}} </p>
+
+            {% endfor %}
+          {%endif%}
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

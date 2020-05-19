@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block main %}
+  <div class="contain">
+    <div class="card mb-3 borderCol" style="max-width: 480px;">
+      <div class="row no-gutters">
+        <div class="col-md-4">
+          <img src="{{ url_for('static', filename='uploads/events/'+event.pic) }}" class="card-img image" alt="...">
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <p class="card-text heading"> {{event.event_name}} </p>
+                <p class="card-text description text-muted"><i class="fas fa-map-marker-alt"></i> {{event.date}} </p>
+                <p class="card-text description text-muted"><i class="far fa-calendar"></i> Admission: {{event.price}} </p>
+            </div>
+        </div>
+        
+        <div class="card-body">
+          <h5 class="class-title edit text-muted">Additional Details</h5>
+          <p class="card-text bio text-muted">Event Sponsors: {{event.sponsors}} </p>
+          <p class="card-text bio text-muted">Event Type: {{event.event_type}} </p>
+          <p class="card-text bio text-muted">Venue: {{event.venue}} </p>
+          <div class="card-footer bg-transparent border-success no-border centered">
+
+          	{% if current_user.account_type == "Guild" %}
+	        	<button onclick = "window.location.href='{{ url_for( 'rsvp', eventid=event.id)}}';" class="btn btn-primary disabled" name="view">RSVP</button> 
+				<p class="card-text description text-muted"><i class="far fa-calendar"></i> RSVPS: {{event.rsvps}} </p>   
+
+				<form action="{{ url_for( 'eventId', eventid=event.id)}}" method="post" enctype="multipart/form-data">
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+						    <button class="btn btn-outline-secondary disabled" type="submit" value="Submit">Support</button>
+					  	</div>
+
+					    {{form.donation(class="form-control",type = "number")}}
+					</div>
+				</form>
+				</div>Donations: ${{event.support}} </p>
+
+	        {% elif current_user.account_type == "Student" %}
+
+	        	<button onclick = "window.location.href='{{ url_for( 'rsvp', eventid=event.id)}}';" class="btn btn-primary" name="view">RSVP</button> 
+				<p class="card-text description text-muted"><i class="far fa-calendar"></i> RSVPS: {{event.rsvps}} </p>  
+
+				<form action="{{ url_for( 'eventId', eventid=event.id)}}" method="post" enctype="multipart/form-data">
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+						    <button class="btn btn-outline-secondary disabled" type="submit" value="Submit">Support</button>
+					  	</div>
+
+					    {{form.donation(class="form-control",type = "number")}}
+					</div>
+				</form>
+				</div>Donations: ${{event.support}} </p>
+
+	        {% else %}
+
+	        	<button onclick = "window.location.href='{{ url_for( 'rsvp', eventid=event.id)}}';" class="btn btn-primary disabled" name="view">RSVP</button> 
+				<p class="card-text description text-muted"><i class="far fa-calendar"></i> RSVPS: {{event.rsvps}} </p>   
+
+				<form action="{{ url_for( 'eventId', eventid=event.id)}}" method="post" enctype="multipart/form-data">
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+						    <button class="btn btn-outline-secondary" type="submit" value="Submit">Support</button>
+					  	</div>
+
+					    {{form.donation(class="form-control",type = "number")}}
+					</div>
+				</form>
+				</div>Donations: ${{event.support}} </p>
+
+	        {% endif %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

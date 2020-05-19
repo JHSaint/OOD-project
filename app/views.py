@@ -10,11 +10,19 @@ from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm
 from app.models import UserProfile
+from app.models import Event
+from app.forms import ProfileForm
+from app.forms import SupportForm
+from app.forms import EventForm
 from werkzeug.security import check_password_hash
+import os
+from werkzeug.utils import secure_filename
+import datetime
 
 ###
 # Routing for your application.
 ###
+
 
 @app.route('/')
 def home():
@@ -51,17 +59,130 @@ def login():
                 login_user(user)
 
                 # remember to flash a message to the user
-                flash('Logged in successfully.', 'success')
-                return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
+                return redirect(url_for("events"))  # they should be redirected to a secure-page route instead
             else:
                 flash('Either your username or password is incorrect.', 'danger')
     return render_template("login.html", form=form)
 
 
-@app.route('/secure-page')
+@app.route("/event", methods=["GET", "POST"])
 @login_required
-def secure_page():
-    return render_template("secure_page.html")
+def event():
+    form = EventForm()
+    if request.method == "POST":
+        if form.validate_on_submit():
+            
+            #Gets the event input from the form
+            name = form.name.data
+            date = form.date.data
+            price = form.price.data
+            sponsors = form.sponsors.data
+            event_type = form.event_type.data
+            location = form.location.data
+            pic= assignPathE(form.pic.data)
+            rsvps = 0
+            support = 0.0
+
+            #create event object and add to database
+            event = Event(name,date,price,sponsors,event_type,location,pic,rsvps,support)
+            print(event.date)
+            db.session.add(event)
+            db.session.commit()
+
+            # remember to flash a message to the user
+            flash('Event information submitted successfully.', 'success')
+        else:
+            flash('Event information not submitted', 'danger')
+        return redirect(url_for("events"))  # they should be redirected to a secure-page route instead
+    return render_template("event.html", form=form)
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    form = ProfileForm()
+    if request.method == "POST":
+        if form.validate_on_submit() :
+            
+            #Gets the user input from the form
+            fname = form.first_name.data
+            lname = form.last_name.data
+            username = form.Username.data
+            password = form.Password.data
+            account_type = form.account_type.data
+            date = format_date_joined()
+            pic= assignPathU(form.pic.data)
+            rsvplst = ""
+            
+            #create user object and add to database
+            user = UserProfile(fname,lname,username,password,account_type,pic,date,rsvplst)
+            db.session.add(user)
+            db.session.commit()
+
+            # remember to flash a message to the user
+            flash('User information submitted successfully.', 'success')
+        else:
+            flash('User information not submitted', 'danger')
+        return redirect(url_for("login"))  # they should be redirected to a secure-page route instead
+    return render_template("profile.html", form=form)
+
+@app.route("/events")
+@login_required
+def events():
+    now = datetime.datetime.now()
+    event_list = db.session.query(Event).filter(Event.date > now).order_by(Event.date)
+    return render_template("events.html", events=event_list)
+
+@app.route("/me")
+@login_required
+def me():
+    events = db.session.query(Event).all()
+    extra = current_user.rsvplst.strip().split(",")
+    i = 0
+    meep = []
+
+    for event in events:
+        if str(event.id) in extra: 
+            meep.append(event)
+    
+    return render_template("person.html", user = current_user, events=events, extra = extra,meep = meep)
+
+
+
+#---------------------------------------------
+@app.route("/events/<eventid>", methods=["GET", "POST"])
+def eventId(eventid):
+    form = SupportForm()
+    event = db.session.query(Event).filter_by(id=int(eventid)).first()
+
+    if request.method == "POST":
+
+        if current_user.account_type == "Sponsor":
+            if form.donation.data:
+                donation = float(form.donation.data)
+                setattr(event, 'support', event.support+donation)
+                db.session.commit()
+                
+
+    return render_template("event_details.html", event=event, form=form)
+
+#---------------------------------------------------------
+
+@app.route("/rsvp/<eventid>")
+def rsvp(eventid):
+    event = db.session.query(Event).filter_by(id=int(eventid)).first()
+    user = db.session.query(UserProfile).filter_by(id=int(current_user.id)).first()
+    rsvplst = user.rsvplst.strip().split(",")
+
+
+    if current_user.account_type == "Student":
+        if str(eventid) in rsvplst:
+            print("hi")
+        else:
+            setattr(event, 'rsvps', event.rsvps+1)
+            setattr(user, 'rsvplst', user.rsvplst+","+eventid)
+            db.session.commit()
+
+    return redirect(url_for("eventId",eventid=event.id))
+
 
 @app.route('/logout')
 @login_required
@@ -86,7 +207,25 @@ def send_text_file(file_name):
     """Send your static text file."""
     file_dot_text = file_name + '.txt'
     return app.send_static_file(file_dot_text)
+    
+def assignPathU(upload):
+    filename = secure_filename(upload.filename)
+    upload.save(os.path.join(
+                app.config['UPLOAD_FOLDERU'], filename
+    ))
+    return filename 
 
+def assignPathE(upload):
+    filename = secure_filename(upload.filename)
+    upload.save(os.path.join(
+                app.config['UPLOAD_FOLDERE'], filename
+    ))
+    return filename 
+
+def format_date_joined():
+    now = datetime.datetime.now()
+    # Return only month and year for date
+    return now.strftime("%B %d, %Y")
 
 @app.after_request
 def add_header(response):

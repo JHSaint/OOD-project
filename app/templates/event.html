@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+	<div class="outer" style="width: 500px;">
+	    <h2>Create Event</h2>
+		<div class="middle borderCol" style="background-color: #fff; padding: 20px 0px 20px 40px;">
+        	<div class="inner">
+                <form action="{{ url_for('event') }}" method="post" enctype="multipart/form-data">
+                	{{ form.csrf_token }}
+                    <div class="f-group">
+                        {{form.name.label(class="label")}}
+                        {{form.name(class="form-control")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.date.label(class="label")}}
+                        {{form.date(class="form-control")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.price.label(class="label")}}
+                        {{form.price(class="form-control")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.sponsors.label(class="label")}}
+                        {{form.sponsors(class='form-control') }}
+                    </div>
+                    <div class="f-group">
+                        {{form.event_type.label(class="label")}}
+                        {{form.event_type(class="form-control")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.location.label(class="label")}}
+                        {{form.location(class="form-control")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.pic.label(class="label")}}
+                        {{form.pic(class="btn-light")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.submit}}
+                    </div>
+                </form>
+            </div>
+        </div>
+	</div>
+{% endblock %}

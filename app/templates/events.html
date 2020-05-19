@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block main %}
+  <div class=outer>
+    <div class="middle">
+      <div class="inner">
+        <h1>Upcoming Events!</h1>
+        {% for event in events %}
+          <div class="card mb-3 borderCol" style="max-width: 590px;">
+            <div class="row no-gutters">
+              <div class="col-md-3">
+                <img src= "{{ url_for('static', filename= 'uploads/events/'+event.pic)}}" class="card-img fixImg" alt="...">
+              </div>
+              <div class="col-md-5">
+                  <div class="card-body">
+                      <p class="card-text profile"> {{event.event_name}} </p>
+                  </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card-body">
+                  <button type="button" name="view" onclick="window.location.href='{{ url_for( 'eventId' , eventid=event.id ) }}';">View Event</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+  
+{% extends "base.html" %}
+
+{% block main %}
+    <div class="outer" style="width: 500px;">
+        <h1>Add Profile</h1>
+        <div class="middle borderCol" style="background-color: #fff; padding: 20px 0px 20px 40px;">
+            <div class="inner">
+                <form action="{{ url_for('profile') }}" method="post" enctype="multipart/form-data">
+                    {{ form.csrf_token }}
+                    <div class="f-group">
+                        {{form.first_name.label(class="label")}}
+                        {{form.first_name(class="form-control")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.last_name.label(class="label")}}
+                        {{form.last_name(class="form-control")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.Username.label(class="label")}}
+                        {{form.Username(class="form-control")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.Password.label}}
+                        {{form.Password(class='form-control') }}
+                    </div>
+                    <div class="f-group">
+                        <option value="none" selected disabled hidden>Select an Option</option>
+                        {{form.account_type.label(class="label")}}
+                        {{form.account_type(class="custom-select")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.pic.label(class="label")}}
+                        {{form.pic(class="btn-light")}}
+                    </div>
+                    <div class="f-group">
+                        {{form.submit}}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
